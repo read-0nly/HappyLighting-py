@@ -335,7 +335,8 @@ def main():
         loop.run_forever()
 
 def test():
-    pass
+    import CustomMode
+    CustomMode.parseCustomMode()
 
 if __name__ == "__main__":
-    main()
+    test()
