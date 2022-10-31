@@ -129,6 +129,11 @@ class MainWindow(QMainWindow):
         self.modeList.addItem("Rainbow jumping change")
         self.modeList.addItem("Pulsating RGB")
         self.modeList.addItem("RGB jumping change")
+        
+        import CustomMode
+        CustomMode.parseCustomMode()
+        for x in Utils.CustomModes.keys():
+            self.modeList.addItem(x.replace(".hpm", ""))
 
 
         info = Utils.p.get_host_api_info_by_index(0)
@@ -224,6 +229,7 @@ class MainWindow(QMainWindow):
         if isModeUsed:
             self.handle_mode(self.modeList.currentIndex().row())
 
+
     def handle_enabledisable(self):
         whois = self.sender().text()
 
@@ -264,7 +270,30 @@ class MainWindow(QMainWindow):
 
     @qasync.asyncSlot()
     async def handle_mode(self, idx):
-        await self.current_client.writeMode(idx)
+        if idx <= 21:
+            await self.current_client.writeMode(idx)
+        else:
+            await self.handle_custom_mode(idx)
+
+    @qasync.asyncSlot()
+    async def handle_custom_mode(self, idx):
+        finalIdx = idx - 22
+        mode = list(Utils.CustomModes.values())[finalIdx]
+        for x in mode:
+            if x.startswith("set_color"):
+                strTmp = x.replace('(', " ").replace(')', " ").replace(',', " ").split(' ')
+                Utils.Colors["Red"] = int(strTmp[1])
+                Utils.Colors["Blue"] = int(strTmp[2])
+                Utils.Colors["Green"] = int(strTmp[3])
+                await self.current_client.writeColor()
+            elif x.startswith("wait"):
+                strTmp = x.replace('(', " ").replace(')', " ").split(' ')
+                from time import sleep
+                sleep(int(strTmp[1]))
+            elif x.startswith("set_mode"):
+                strTmp = x.replace('(', " ").replace(')', " ").replace(',', " ").split(' ')
+                Utils.Speed = int(strTmp[1])
+                self.handle_mode(int(strTmp[2]))
     
     def updateMicDevice(self, index):
         Utils.selectedInputDevice = index
@@ -335,8 +364,7 @@ def main():
         loop.run_forever()
 
 def test():
-    import CustomMode
-    CustomMode.parseCustomMode()
+    pass
 
 if __name__ == "__main__":
-    test()
+    main()

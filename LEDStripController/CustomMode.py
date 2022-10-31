@@ -11,4 +11,4 @@ def parseCustomMode():
                        instr.append(line.rstrip())
 
                Utils.CustomModes[filename] = instr
-               Utils.Modes.append(Utils.Modes[-1] + 1)
+               #Utils.Modes.append(Utils.Modes[-1] + 1)

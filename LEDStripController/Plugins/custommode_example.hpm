@@ -1,8 +1,10 @@
 ```Change color to white
 change_color(255,255,255)
 
-```Set existing mode (Mode, Speed) Max speed is 10; Min Speed is 1
-set_mode(37, 1)
-
 ```Sleep with seconds
 wait(5)
+
+
+```Set existing mode (Mode, Speed) Max speed is 10; Min Speed is 1
+set_mode(0, 1)
+
