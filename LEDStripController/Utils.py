@@ -1,7 +1,7 @@
 import os
 import pyaudio
 
-DEBUG_LOGS = False
+DEBUG_LOGS = True
 
 CustomModes = {}
 Modes = [37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 
@@ -16,9 +16,11 @@ selectedInputDevice = -1
 app = None
 captureMode = False
 
+
 Speed = 0
 isModeUsed = False
 client = None
+customMode = False
 
 localAudio = False
 GreenMic = True

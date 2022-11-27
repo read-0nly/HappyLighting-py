@@ -1,5 +1,5 @@
-```Change color to white
-change_color(255,255,255)
+```Change color to red
+set_color(255,0,0)
 
 ```Sleep with seconds
 wait(5)

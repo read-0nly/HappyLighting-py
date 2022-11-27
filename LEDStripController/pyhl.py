@@ -97,7 +97,7 @@ class MainWindow(QMainWindow):
         self.scan_button.clicked.connect(self.handle_scan)
         self.connect_button.clicked.connect(self.handle_connect)
         self.send_button.clicked.connect(self.handle_send)
-        self.modeList.itemDoubleClicked.connect(self.selectMode)
+        self.modeList.itemClicked.connect(self.selectMode)
         self.deviceMic.stateChanged.connect(self.handle_mic)
         self.localMic.stateChanged.connect(self.handle_localmic)
         self.startCapture.stateChanged.connect(self.handle_startcapture)
@@ -268,32 +268,38 @@ class MainWindow(QMainWindow):
             Utils.printLog("Colors error {}".format(ex))
 
 
+    async def start_custom_mode(self, idx):
+        from time import sleep
+        finalIdx = idx - 22
+        mode = list(Utils.CustomModes.values())[finalIdx]
+        while Utils.customMode:
+            for x in mode:
+                if x.startswith("set_color"):
+                    strTmp = x.replace('(', " ").replace(')', " ").replace(',', " ").split(' ')
+                    Utils.Colors["Red"] = int(strTmp[1])
+                    Utils.Colors["Blue"] = int(strTmp[2])
+                    Utils.Colors["Green"] = int(strTmp[3])
+                    await self.current_client.writeColor()
+                elif x.startswith("wait"):
+                    strTmp = x.replace('(', " ").replace(')', " ").split(' ')
+                    sleep(int(strTmp[1]))
+                elif x.startswith("set_mode"):
+                    strTmp = x.replace('(', " ").replace(')', " ").replace(',', " ").split(' ')
+                    strTmp = list(filter(None, strTmp))
+                    Utils.Speed = int(strTmp[1])
+                    print(strTmp)
+                    await self.current_client.writeMode(int(strTmp[2]))
+
     @qasync.asyncSlot()
     async def handle_mode(self, idx):
         if idx <= 21:
+            Utils.customMode = False
             await self.current_client.writeMode(idx)
         else:
-            await self.handle_custom_mode(idx)
+            Utils.customMode = True
+            loop = asyncio.get_running_loop()
+            loop.run_in_executor(None, lambda: asyncio.run(self.start_custom_mode(idx)))
 
-    @qasync.asyncSlot()
-    async def handle_custom_mode(self, idx):
-        finalIdx = idx - 22
-        mode = list(Utils.CustomModes.values())[finalIdx]
-        for x in mode:
-            if x.startswith("set_color"):
-                strTmp = x.replace('(', " ").replace(')', " ").replace(',', " ").split(' ')
-                Utils.Colors["Red"] = int(strTmp[1])
-                Utils.Colors["Blue"] = int(strTmp[2])
-                Utils.Colors["Green"] = int(strTmp[3])
-                await self.current_client.writeColor()
-            elif x.startswith("wait"):
-                strTmp = x.replace('(', " ").replace(')', " ").split(' ')
-                from time import sleep
-                sleep(int(strTmp[1]))
-            elif x.startswith("set_mode"):
-                strTmp = x.replace('(', " ").replace(')', " ").replace(',', " ").split(' ')
-                Utils.Speed = int(strTmp[1])
-                self.handle_mode(int(strTmp[2]))
     
     def updateMicDevice(self, index):
         Utils.selectedInputDevice = index
@@ -324,11 +330,7 @@ class MainWindow(QMainWindow):
                     return np.unravel_index(np.bincount(a1D).argmax(), col_range)
                 except Exception as err:
                     Utils.printLog(err)
-
-            
-
-            
-           
+    
             #print('reading image')
             im = ImageGrab.grab()
             #im = Image.open('image.jpg')
