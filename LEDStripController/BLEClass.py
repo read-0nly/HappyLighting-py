@@ -6,6 +6,7 @@ from bleak import BleakScanner, BleakClient
 from bleak.backends.device import BLEDevice
 from PyQt5.QtCore import QObject, pyqtSignal
 import VTCodes
+import colorsys
 UART_SERVICE_UUID = ""
 UART_RX_CHAR_UUID = ""
 UART_TX_CHAR_UUID = ""
@@ -55,10 +56,7 @@ class QBleakClient(QObject):
             values = bytearray(lista)
             try:
                 if Utils.PRETTY:
-                    Utils.printLog(
-                        VTCodes.fg_fromRGB(Utils.Colors["Red"], Utils.Colors["Green"], Utils.Colors["Blue"],
-                        "Change Color called R:{} G:{} B:{} ".format(Utils.Colors["Red"], Utils.Colors["Green"], Utils.Colors["Blue"]))+VTCodes.RESET
-                        )
+                    Utils.printLog(VTCodes.fg_fromRGB(Utils.Colors["Red"], Utils.Colors["Green"], Utils.Colors["Blue"],"Change Color called {}".format("#"*int(colorsys.rgb_to_hsv(Utils.Colors["Red"], Utils.Colors["Green"], Utils.Colors["Blue"])[2]/5)))+VTCodes.RESET)
                 else:
                     Utils.printLog("Change Color called R:{} G:{} B:{} ".format(Utils.Colors["Red"], Utils.Colors["Green"], Utils.Colors["Blue"]))
                 await self.client.write_gatt_char(UART_TX_CHAR_UUID, values, False)

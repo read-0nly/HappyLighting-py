@@ -7,6 +7,7 @@ import Utils
 import time
 import sys
 import os 
+import VTCodes
 from struct import *
 
 devices = []
@@ -123,13 +124,15 @@ async def main():
     for arg in args:
         if arg=="/c":
             cmd=args[x+1]
-            loop=False
             cmds = cmd.split(";")
             for subcmd in cmds:
                 await handle_command(subcmd)
+        if arg=="/script":
+            path=args[x+1]
+            await handle_file(path)
         if arg=="/pretty":
             Utils.PRETTY=True
-            print("not implemented yet - will add color support to terminal output")
+            print(VTCodes.Fore.BRIGHTMAGENTA+"P" + VTCodes.Fore.BRIGHTRED+"R" + VTCodes.Fore.BRIGHTYELLOW+"E" + VTCodes.Fore.BRIGHTGREEN+"T" + VTCodes.Fore.BRIGHTCYAN+"T" + VTCodes.Fore.BRIGHTMAGENTA+"Y"+ VTCodes.RESET+" MODE ENABLED")
         if arg=="/quiet":
             Utils.DEBUG_LOGS = False
         if arg=="/verbose":
@@ -142,7 +145,20 @@ async def main():
             await handle_command(subcmd)
             #if len(cmds) > 1:
                 #time.sleep(0.1)
- 
+
+
+async def handle_file(path):
+    try:
+        with open(os.path.dirname(__file__)+'/'+path) as f:
+            lines = f.readlines()
+            for s in lines:
+                s2 = s.replace("\r","").replace("\n","")
+                print(s2)
+                await handle_command(s2)
+    except Exception as ex:
+        print("error")
+        return
+
 async def handle_command(cmd):
     if (cmd == "help"):
         print("")
@@ -194,11 +210,42 @@ async def handle_command(cmd):
         print("  scanall;filter 00:00:00:00:00:00;connect;on;color 255,0,0;wait;color 255,255,255;wait;color 255,0,0;wait;off;quit")
         print("")
         print("Command line arguments")
-        print ("python.exe cmdver.py [/quiet|/verbose] [/pretty] [/c \"command string\"]")
+        print ("python.exe cmdver.py [/quiet|/verbose] [/pretty] [/c \"command string\"] /script [script file]")
         print("  /quiet: Turns off script debug output")
         print("  /verbose: Turns on script debug output")
-        print("  /pretty: To be implemented - will enable VT100 color code use")
+        print("  /pretty: Enables VT100 color code")
         print("  /c \"command string\": Stick your command string  in the quotes, it'll run all the steps in the command string  then go back to the command loop (add quit to the command string to quit after command string)")
+        print("  /script script.hls: loads the file sitting alongside this python file, then runs lines sequentially")
+        print("")
+        print("Script File Example")
+        print("===================")
+        print("off")
+        print("color 255,0,0")
+        print("wait 500")
+        print("on")
+        print("wait 500")
+        print("off")
+        print("wait 500")
+        print("on")
+        print("wait 500")
+        print("off")
+        print("wait 500")
+        print("on")
+        print("wait 500")
+        print("off")
+        print("wait 500")
+        print("on")
+        print("wait 500")
+        print("off")
+        print("wait 500")
+        print("on")
+        print("wait 500")
+        print("off")
+        print("wait 500")
+        print("color 255,255,255")
+        print("on")
+        print("quit")
+
             
     if (cmd == "scan"):
         future = asyncio.ensure_future(handle_scan(False))
