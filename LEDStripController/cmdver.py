@@ -146,17 +146,22 @@ async def main():
             #if len(cmds) > 1:
                 #time.sleep(0.1)
 
-
+async def runmod():
+    return
 async def handle_file(path):
     try:
-        with open(os.path.dirname(__file__)+'/'+path) as f:
-            lines = f.readlines()
-            for s in lines:
-                s2 = s.replace("\r","").replace("\n","")
-                print(s2)
-                await handle_command(s2)
+        if path.endswith(".py"):
+            exec("import "+path.replace(".py","")+" as mod;runmod=mod.execute", globals())
+            await runmod()
+        else:
+            with open(os.path.dirname(__file__)+'/'+path) as f:
+                lines = f.readlines()
+                for s in lines:
+                    s2 = s.replace("\r","").replace("\n","")
+                    print(s2)
+                    await handle_command(s2)
     except Exception as ex:
-        print("error")
+        print(str(ex))
         return
 
 async def handle_command(cmd):
@@ -306,4 +311,8 @@ async def handle_command(cmd):
 
     if (cmd == "quit"):
         quit()
-asyncio.run(main())
+
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
