@@ -22,7 +22,7 @@ def visualize_spectrum(y):
     maxValue = y[maxIndex]
     avg = np.average(y)
     #print (str(maxIndex/len(y))+":"+str((avg/maxValue))+":"+str(maxValue))
-    color = colorsys.hsv_to_rgb(min(0.9,pow((maxIndex/len(y))/1.5,0.5)),1-(avg/maxValue),maxValue)
+    color = colorsys.hsv_to_rgb(min(0.9,pow((maxIndex/len(y))/1.5,0.5)),pow(1-(avg/maxValue),0.2),maxValue)
     ExternalAudio._prev_spectrum = np.copy(y)
     # Color channel mappings
     r = np.array([color[0]])
