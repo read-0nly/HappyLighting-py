@@ -1,7 +1,7 @@
 import os
 import pyaudio
 
-DEBUG_LOGS = False
+DEBUG_LOGS = True
 Modes = [37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 
          47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 
          97, 98, 99]
@@ -78,6 +78,8 @@ N_ROLLING_HISTORY = 2
 MIN_VOLUME_THRESHOLD = 1e-7
 """No music visualization displayed if recorded audio volume below threshold"""
 
+PRETTY=False
+"""Controls outputting color codes"""
 
 def printLog(text):
     if DEBUG_LOGS:

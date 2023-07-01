@@ -1,0 +1,26 @@
+off
+color 255,0,0
+wait 500
+on
+wait 500
+off
+wait 500
+on
+wait 500
+off
+wait 500
+on
+wait 500
+off
+wait 500
+on
+wait 500
+off
+wait 500
+on
+wait 500
+off
+wait 500
+color 255,255,255
+on
+quit
