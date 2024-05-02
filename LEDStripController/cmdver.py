@@ -6,8 +6,7 @@ import BLEClass
 import Utils
 import time
 import sys
-import os 
-import VTCodes
+import sys
 from struct import *
 
 devices = []
@@ -86,10 +85,9 @@ async def handle_audio(device):
                 Utils.InputDevices[i] = tmp_device
                 print(str(i)+": "+tmp_device["name"])
         device=input("Select device index:")
-    Utils.selectedInputDevice=int(device.split(" ")[0])
+    Utils.selectedInputDevice=int(device)
     Utils.localAudio=True
-    if(len(device.split(" "))>1!=NULL):
-        await handle_visset("vis_"+device.split(" ")[1])
+    await handle_visset("vis_"+"InvertedRainbow")
     await ExternalAudio.start_stream()
     print("Audio Over")
 
@@ -104,7 +102,7 @@ async def build_client(device):
     if Utils.client is not None:
         await Utils.client.stop()
     Utils.client = BLEClass.QBleakClient(device)
-    Utils.client.messageChanged.connect(handle_message_changed)
+    #Utils.client.messageChanged.connect(handle_message_changed)
     await Utils.client.start()
     Utils.printLog("Connected")
 
@@ -118,21 +116,15 @@ async def main():
     Utils.DEBUG_LOGS = True
     loop = True
     x=0
-    if sys.platform == "win32":
-        os.system('color')
-
     for arg in args:
         if arg=="/c":
             cmd=args[x+1]
+            loop=False
             cmds = cmd.split(";")
             for subcmd in cmds:
                 await handle_command(subcmd)
-        if arg=="/script":
-            path=args[x+1]
-            await handle_file(path)
         if arg=="/pretty":
-            Utils.PRETTY=True
-            print(VTCodes.Fore.BRIGHTMAGENTA+"P" + VTCodes.Fore.BRIGHTRED+"R" + VTCodes.Fore.BRIGHTYELLOW+"E" + VTCodes.Fore.BRIGHTGREEN+"T" + VTCodes.Fore.BRIGHTCYAN+"T" + VTCodes.Fore.BRIGHTMAGENTA+"Y"+ VTCodes.RESET+" MODE ENABLED")
+            print("not implemented yet - will add color support to terminal output")
         if arg=="/quiet":
             Utils.DEBUG_LOGS = False
         if arg=="/verbose":
@@ -145,25 +137,7 @@ async def main():
             await handle_command(subcmd)
             #if len(cmds) > 1:
                 #time.sleep(0.1)
-
-async def runmod():
-    return
-async def handle_file(path):
-    try:
-        if path.endswith(".py"):
-            exec("import "+path.replace(".py","")+" as mod;runmod=mod.execute", globals())
-            await runmod()
-        else:
-            with open(os.path.dirname(__file__)+'/'+path) as f:
-                lines = f.readlines()
-                for s in lines:
-                    s2 = s.replace("\r","").replace("\n","")
-                    print(s2)
-                    await handle_command(s2)
-    except Exception as ex:
-        print(str(ex))
-        return
-
+ 
 async def handle_command(cmd):
     if (cmd == "help"):
         print("")
@@ -188,10 +162,8 @@ async def handle_command(cmd):
         print("connect")
         print("  connect to a device")
         print("")
-        print("color [red],[green],[blue]")
+        print("color")
         print("  send a color")
-        print("  for example:")
-        print("    color 255,0,0")
         print("")
         print("on")
         print("  turn on lights")
@@ -199,58 +171,8 @@ async def handle_command(cmd):
         print("off")
         print("  turn off lights")
         print("")
-        print("audio [input device] [visualizer script]")
-        print("  start audio visualizer. Without parameters, uses default visualizer and asks for input device.")
-        print("  for example:")
-        print("    audio 0 NorthernLights")
-        print("")
-        print("wait [milliseconds]")
-        print("   Waits for specified milliseconds - if none specified, waits a second")
-        print("")
         print("quit")
         print("  quit program gracefully")
-        print("")
-        print("To chain multiple commands, separate them with semicolons, no spaces")
-        print("for  example:")
-        print("  scanall;filter 00:00:00:00:00:00;connect;on;color 255,0,0;wait;color 255,255,255;wait;color 255,0,0;wait;off;quit")
-        print("")
-        print("Command line arguments")
-        print ("python.exe cmdver.py [/quiet|/verbose] [/pretty] [/c \"command string\"] /script [script file]")
-        print("  /quiet: Turns off script debug output")
-        print("  /verbose: Turns on script debug output")
-        print("  /pretty: Enables VT100 color code")
-        print("  /c \"command string\": Stick your command string  in the quotes, it'll run all the steps in the command string  then go back to the command loop (add quit to the command string to quit after command string)")
-        print("  /script script.hls: loads the file sitting alongside this python file, then runs lines sequentially")
-        print("")
-        print("Script File Example")
-        print("===================")
-        print("off")
-        print("color 255,0,0")
-        print("wait 500")
-        print("on")
-        print("wait 500")
-        print("off")
-        print("wait 500")
-        print("on")
-        print("wait 500")
-        print("off")
-        print("wait 500")
-        print("on")
-        print("wait 500")
-        print("off")
-        print("wait 500")
-        print("on")
-        print("wait 500")
-        print("off")
-        print("wait 500")
-        print("on")
-        print("wait 500")
-        print("off")
-        print("wait 500")
-        print("color 255,255,255")
-        print("on")
-        print("quit")
-
             
     if (cmd == "scan"):
         future = asyncio.ensure_future(handle_scan(False))
@@ -311,8 +233,4 @@ async def handle_command(cmd):
 
     if (cmd == "quit"):
         quit()
-
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
+asyncio.run(main())
