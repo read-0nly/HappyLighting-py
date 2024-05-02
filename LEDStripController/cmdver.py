@@ -129,6 +129,8 @@ async def main():
             Utils.DEBUG_LOGS = False
         if arg=="/verbose":
             Utils.DEBUG_LOGS = True
+        if arg=="/interactive":
+            loop=True
         x+=1
     while loop:
         cmd = input("()> ")
